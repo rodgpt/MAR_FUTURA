@@ -7,6 +7,8 @@ suppressPackageStartupMessages({
   library(ggplot2)
 })
 
+input_dir <- "/Users/rod/Library/CloudStorage/GoogleDrive-royanedel@marfutura.org/Unidades compartidas/MAR FUTURA/Hydrophones/NDSIResults/ndsi_casestudies_20251021-20251022_anthro_1000-2000_bio_2000-3000.csv" # nolint: line_length_linter.
+
 utils::globalVariables(c(
   "Site",
   "Time",
@@ -225,6 +227,15 @@ make_tables <- function(plot_data) {
 main <- function() {
   args <- parse_args(commandArgs(trailingOnly = TRUE))
 
+  if ((is.null(args$input_dir) || !nzchar(args$input_dir)) && nzchar(input_dir)) {
+    args$input_dir <- input_dir
+  }
+
+  if (!is.null(args$input_dir) && nzchar(args$input_dir) && file.exists(args$input_dir) && !dir.exists(args$input_dir)) {
+    args$input_file <- args$input_dir
+    args$input_dir <- NULL
+  }
+
   input_paths <- character()
   if (!is.null(args$input_file) && nzchar(args$input_file)) {
     input_paths <- c(input_paths, args$input_file)
@@ -277,3 +288,11 @@ main <- function() {
 }
 
 main()
+
+
+
+
+
+
+
+
