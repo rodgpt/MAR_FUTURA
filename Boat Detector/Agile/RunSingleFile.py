@@ -12,8 +12,8 @@ from perch_hoplite.agile.classifier import LinearClassifier
 
 
 WAV_PATH = "/Volumes/Card3a/20251211_132600.WAV"
-DB_PATH = "/Users/Rodrigo/Library/CloudStorage/GoogleDrive-royanedel@marfutura.org/Unidades compartidas/MAR FUTURA/Hydrophones/BOAT DETECTOR AGILE/single_file_db"
-CLASSIFIER_PATH = "/Users/Rodrigo/Library/CloudStorage/GoogleDrive-royanedel@marfutura.org/Unidades compartidas/MAR FUTURA/Hydrophones/BOAT DETECTOR AGILE/agile_classifier_v2.pt"
+DB_PATH = "/Users/Rodrigo/Library/CloudStorage/GoogleDrive-royanedel@marfutura.org/Unidades compartidas/Hydrophones/BOAT DETECTOR AGILE/single_file_db"
+CLASSIFIER_PATH = "/Users/Rodrigo/Library/CloudStorage/GoogleDrive-royanedel@marfutura.org/Unidades compartidas/Hydrophones/BOAT DETECTOR AGILE/agile_classifier_v2.pt"
 MODEL_CHOICE = "perch_8"
 LOGIT_THRESHOLD = 1.25
 DATASET_NAME = "SingleFileDataset"
