@@ -277,6 +277,5 @@ Recommended workflow:
 - Create a feature branch.
 - Make changes.
 - Commit.
-- Merge into `main`.
+- Merge into `main` after asking Rod.
 
-If you want, I can also add a short “release checklist” section once your workflows stabilize.
