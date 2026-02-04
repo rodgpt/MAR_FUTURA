@@ -4,14 +4,14 @@ This repository contains analysis and detection workflows used in the MAR FUTURA
 
 The codebase is organized by *project category*:
 
-- **Boat Detector** (AGILE / perch-hoplite embeddings + classifier)
-- **NDSI** (soundscape metrics / NDSI analysis in Python and R)
+- **Boat Detector** (AGILE / Islam's way)
+- **NDSI** (soundscape metrics in Python and R)
 - **Shrimp Detector** (snapping shrimp click-rate analysis)
 
 Many workflows can be run:
 
-- **Locally (recommended for large datasets)** using your Mac + Google Drive File Stream or local disks.
-- **In Google Colab** (useful for quick tests, sharing, or GPU/CPU availability), typically with Google Drive mounted.
+- **Locally** using your Mac + Google Drive File Stream or local disks.
+- **In Google Colab** typically with Google Drive mounted.
 
 ---
 
@@ -28,7 +28,7 @@ Many workflows can be run:
 - `NDSI/`
   - `SiteAnalysis_Python.ipynb` (single-site analysis in Python)
   - `NDSI_Sites_Comparison_Python.ipynb` (multi-site comparison in Python)
-  - `R files/`
+  - `R files/` (not needed now really)
     - `SiteAnalysis_R.ipynb` (single-site analysis in R)
     - `NDSI_Sites_Comparisson_R.ipynb` (multi-site comparison in R)
     - `Plots.R` (plot helpers)
@@ -37,7 +37,7 @@ Many workflows can be run:
   - `Detector/`
     - `ClickRateAnalysis.ipynb` (single-site click-rate analysis)
     - `ClickRate_Sites_Comparison.ipynb` (multi-site click-rate comparison)
-    - Additional Python scripts (prefixed with `# ...`)
+    - Additional Python scripts (prefixed with `# `) These were written by Margherita
   - `Figures/` (plot scripts + outputs)
 
 ---
@@ -56,12 +56,6 @@ Most notebooks that support Colab will follow this pattern:
 **Important:** Colab storage (`/content`) is ephemeral. If a workflow stages embeddings to `/content`, it must copy results back to Drive to persist them.
 
 ## Local (general pattern)
-
-Local runs are best for:
-
-- Large audio datasets.
-- Avoiding Colab session resets.
-- Faster I/O when your data is on a truly local disk (SSD).
 
 Typical local setup:
 
@@ -136,36 +130,6 @@ Colab workflows often include a sync step back to Drive so the DB persists beyon
 
 This runs the same embedding + classifier pipeline but only for one WAV.
 
-Typical usage:
-
-- Edit constants at the top:
-  - `WAV_PATH`
-  - `DB_PATH`
-  - `CLASSIFIER_PATH`
-  - `LOGIT_THRESHOLD`
-  - and sharding parameters like `SHARD_LENGTH_IN_SECONDS`
-
-Then run the script locally.
-
-## Common issues (Boat Detector)
-
-### Google Drive File Stream: stalls / timeouts when reading WAVs
-
-If embedding “hangs” at 0% or becomes extremely slow, Drive File Stream can be the cause (online-only files, throttling, partial hydration, etc.).
-
-Recommended workarounds:
-
-- Make the audio folder **available offline** in Drive for Desktop.
-- Use **Mirror files** mode (so WAVs are real local files).
-- Copy the dataset to a **real local SSD path** and point `input_audio_dir` there.
-
-### SQLite “database is locked” when DB is on Drive
-
-If `db_path` is on Google Drive, the sync layer can interfere with SQLite.
-
-Recommended workaround:
-
-- Put `db_path` on a real local disk (e.g. under your home folder), then copy results back to Drive when finished.
 
 ---
 
@@ -205,7 +169,7 @@ Location: `NDSI/R files/`
 
 These are R equivalents of the Python workflows.
 
-**Note:** R notebook execution depends on your local R + Jupyter/R kernel setup.
+**Note:** R notebook execution depends on your local R + Jupyter/R kernel setup. Dont need them for now.
 
 ---
 
@@ -235,38 +199,6 @@ Typical steps:
 
 - Define multiple site folders.
 - Run to compute metrics across sites and generate comparison plots.
-
----
-
-# Data, paths, and storage notes
-
-## Google Drive folder prefix
-
-Many scripts/notebooks assume a Drive File Stream prefix like:
-
-- `/Users/Rodrigo/Library/CloudStorage/GoogleDrive-royanedel@marfutura.org/Unidades compartidas/Hydrophones/`
-
-If you reorganize the Shared Drive or move the repo, you may need to update configuration cells.
-
-## Local cache/staging (previous workflow)
-
-During earlier local experiments, temporary staging was written under:
-
-- `~/Library/Caches/agile_runmodel`
-
-If you no longer need it, it can be safely deleted.
-
----
-
-# Suggested environment setup (Local)
-
-Because notebooks use different libraries, install what each notebook needs. Typical dependencies include:
-
-- `numpy`, `pandas`, `matplotlib`, `seaborn`
-- Audio: `soundfile`, `librosa`, `scipy`
-- Boat Detector: `perch_hoplite`
-
-If you want, we can add a pinned `requirements.txt` later once you confirm which environments you’re using for each category.
 
 ---
 
