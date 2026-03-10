@@ -69,21 +69,6 @@ cat(sprintf("Found %d WAV files in input_data_root\n", wav_count))
 cat(sprintf("Pipeline progress: 0/%d steps completed\n\n", length(required_scripts)))
 flush.console()
 
-step1_root <- tempfile(pattern = "boat_detection_input_")
-dir.create(step1_root, recursive = TRUE)
-on.exit(unlink(step1_root, recursive = TRUE, force = TRUE), add = TRUE)
-
-step1_site_dir <- file.path(step1_root, selected_site)
-linked <- file.symlink(input_data_root, step1_site_dir)
-if (!isTRUE(linked)) {
-  dir.create(step1_site_dir, recursive = TRUE)
-  wav_files <- list.files(input_data_root, full.names = TRUE, all.files = FALSE, no.. = TRUE)
-  copied <- file.copy(wav_files, step1_site_dir, recursive = TRUE)
-  if (length(wav_files) > 0 && !all(copied)) {
-    stop("Failed to prepare temporary input folder for 01_extract_features.R")
-  }
-}
-
 pipeline_start <- Sys.time()
 
 cat(sprintf("============================================================\n"))
@@ -91,7 +76,7 @@ cat(sprintf("[1/%d] Running %s\n", length(required_scripts), required_scripts[1]
 cat(sprintf("============================================================\n"))
 flush.console()
 step_start <- Sys.time()
-setwd(step1_root)
+setwd(project_root)
 source(file.path(project_root, required_scripts[1]), local = FALSE)
 step_elapsed <- difftime(Sys.time(), step_start, units = "secs")
 cat(sprintf("Completed step 1 in %.1f seconds\n", as.numeric(step_elapsed)))
@@ -99,12 +84,10 @@ cat(sprintf("Pipeline progress: 1/%d steps completed\n", length(required_scripts
 cat("\n")
 flush.console()
 
-step1_output <- file.path(step1_root, "boat_features_all.csv")
+step1_output <- file.path(project_root, "boat_features_all.csv")
 if (!file.exists(step1_output)) {
   stop("01_extract_features.R did not create boat_features_all.csv")
 }
-
-file.copy(step1_output, file.path(project_root, "boat_features_all.csv"), overwrite = TRUE)
 
 for (i in seq_along(required_scripts[-1])) {
   script_name <- required_scripts[-1][i]

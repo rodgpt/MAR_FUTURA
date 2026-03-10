@@ -10,13 +10,17 @@ library(tuneR)
 library(signal)
 library(parallel)
 
-site_folders <- list(
-  "Las Cruces 26"  = "Las Cruces 26",
-  "Matanzas 32"    = "Matanzas 32",
-  "San Antonio 38" = "San Antonio 38",
-  "Ventanas 36"    = "Ventanas 36",
-  "Zapallar 34"    = "Zapallar 34"
-)
+if (exists("input_data_root") && exists("selected_site")) {
+  site_folders <- setNames(list(input_data_root), selected_site)
+} else {
+  site_folders <- list(
+    "Las Cruces 26"  = "Las Cruces 26",
+    "Matanzas 32"    = "Matanzas 32",
+    "San Antonio 38" = "San Antonio 38",
+    "Ventanas 36"    = "Ventanas 36",
+    "Zapallar 34"    = "Zapallar 34"
+  )
+}
 
 extract_features <- function(wav_path) {
   tryCatch({
@@ -78,8 +82,18 @@ extract_features <- function(wav_path) {
   }, error=function(e) NULL)
 }
 
+split_into_chunks <- function(x, chunk_size) {
+  if (length(x) == 0) return(list())
+  split(x, ceiling(seq_along(x) / chunk_size))
+}
+
 N_CORES <- max(1, detectCores() - 1)
-cat(sprintf("Using %d cores\n\n", N_CORES))
+progress_mode <- exists("input_data_root") && exists("selected_site")
+if (progress_mode) {
+  cat("Using sequential mode for visible progress updates\n\n")
+} else {
+  cat(sprintf("Using %d cores\n\n", N_CORES))
+}
 
 all_results <- data.frame()
 
@@ -90,20 +104,68 @@ for (site_name in names(site_folders)) {
   cat(sprintf("Processing: %-20s  %d files...\n", site_name, length(wav_list)))
   t0 <- proc.time()
 
-  if (.Platform$OS.type == "windows") {
+  if (length(wav_list) == 0) {
+    cat("  No WAV files found\n")
+    next
+  }
+
+  chunk_size <- max(1, min(250, ceiling(length(wav_list) / 100)))
+  wav_chunks <- split_into_chunks(wav_list, chunk_size)
+  processed_count <- 0
+  last_reported_count <- 0
+  results_list <- list()
+
+  if (progress_mode) {
+    report_every <- 10
+    print(sprintf("Progress: 0 / %d files", length(wav_list)))
+    flush.console()
+    for (f in wav_list) {
+      d <- extract_features(file.path(folder, f))
+      if (!is.null(d)) {
+        results_list[[length(results_list) + 1]] <- cbind(file=f, d)
+      }
+      processed_count <- processed_count + 1
+      if (processed_count >= length(wav_list) ||
+          processed_count - last_reported_count >= report_every) {
+        print(sprintf("Progress: %d / %d files", processed_count, length(wav_list)))
+        flush.console()
+        last_reported_count <- processed_count
+      }
+    }
+  } else if (.Platform$OS.type == "windows") {
     cl <- makeCluster(N_CORES)
     clusterEvalQ(cl, { library(tuneR); library(signal) })
     clusterExport(cl, c("extract_features","folder"), envir=environment())
-    results_list <- parLapply(cl, wav_list, function(f) {
-      d <- extract_features(file.path(folder, f))
-      if (!is.null(d)) cbind(file=f, d) else NULL
-    })
+    for (chunk in wav_chunks) {
+      chunk_results <- parLapply(cl, chunk, function(f) {
+        d <- extract_features(file.path(folder, f))
+        if (!is.null(d)) cbind(file=f, d) else NULL
+      })
+      results_list <- c(results_list, chunk_results)
+      processed_count <- processed_count + length(chunk)
+      if (processed_count >= length(wav_list) ||
+          processed_count - last_reported_count >= chunk_size) {
+        cat(sprintf("  Progress: %d / %d files\n", processed_count, length(wav_list)))
+        flush.console()
+        last_reported_count <- processed_count
+      }
+    }
     stopCluster(cl)
   } else {
-    results_list <- mclapply(wav_list, function(f) {
-      d <- extract_features(file.path(folder, f))
-      if (!is.null(d)) cbind(file=f, d) else NULL
-    }, mc.cores=N_CORES)
+    for (chunk in wav_chunks) {
+      chunk_results <- mclapply(chunk, function(f) {
+        d <- extract_features(file.path(folder, f))
+        if (!is.null(d)) cbind(file=f, d) else NULL
+      }, mc.cores=N_CORES)
+      results_list <- c(results_list, chunk_results)
+      processed_count <- processed_count + length(chunk)
+      if (processed_count >= length(wav_list) ||
+          processed_count - last_reported_count >= chunk_size) {
+        cat(sprintf("  Progress: %d / %d files\n", processed_count, length(wav_list)))
+        flush.console()
+        last_reported_count <- processed_count
+      }
+    }
   }
 
   site_df <- do.call(rbind, Filter(Negate(is.null), results_list))
