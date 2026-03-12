@@ -51,7 +51,7 @@ extract_features <- function(wav_path) {
 
     rms           <- sqrt(mean(amp^2))
     noise_floor   <- median(psd_band)
-    boat_tonality <- 10*log10((mean(psd_band)+1e-10)/(noise_floor+1e-10))
+    boat_tonality <- max(psd_band) / (median(psd_band) + 1e-10)
     peak_freq     <- f_band[which.max(psd_band)]
 
     sorted_psd  <- sort(psd_band, decreasing=TRUE)
