@@ -1,5 +1,5 @@
 project_root <- "/Users/rodrigo/Desktop/CODES/Boat Detector/Islam/medium-gain-analysis"
-selected_site <- "Matanzas 32"
+run_all_sites <- TRUE
 
 site_input_paths <- c(
   "Las Cruces 26" = "/Volumes/PortableSSD/Hydrophones/LasCruces/12-11-25/26",
@@ -42,15 +42,25 @@ cat(sprintf("Using site label: %s\n", selected_site))
 cat("Scanning input folder for WAV files...\n")
 flush.console()
 
-wav_count <- length(
-  list.files(
-    input_data_root,
-    pattern = "\\.wav$",
-    ignore.case = TRUE,
-    recursive = FALSE,
-    full.names = TRUE
+wav_count <- if (isTRUE(run_all_sites)) {
+  sum(
+    vapply(
+      site_input_paths,
+      function(p) length(list.files(p, pattern = "\\.wav$", ignore.case = TRUE, recursive = FALSE)),
+      integer(1)
+    )
   )
-)
+} else {
+  length(
+    list.files(
+      input_data_root,
+      pattern = "\\.wav$",
+      ignore.case = TRUE,
+      recursive = FALSE,
+      full.names = TRUE
+    )
+  )
+}
 
 required_scripts <- c(
   "01_extract_features.R",
@@ -86,7 +96,20 @@ cat(sprintf("============================================================\n"))
 flush.console()
 step_start <- Sys.time()
 setwd(project_root)
-source(file.path(project_root, required_scripts[1]), local = FALSE)
+if (isTRUE(run_all_sites)) {
+  all_site_features <- list()
+  for (site_name in names(site_input_paths)) {
+    selected_site <- site_name
+    input_data_root <- site_input_paths[[selected_site]]
+    source(file.path(project_root, required_scripts[1]), local = FALSE)
+    site_features <- read.csv(file.path(project_root, "boat_features_all.csv"), stringsAsFactors = FALSE)
+    all_site_features[[length(all_site_features) + 1]] <- site_features
+  }
+  combined_features <- do.call(rbind, all_site_features)
+  write.csv(combined_features, file.path(project_root, "boat_features_all.csv"), row.names = FALSE)
+} else {
+  source(file.path(project_root, required_scripts[1]), local = FALSE)
+}
 step_elapsed <- difftime(Sys.time(), step_start, units = "secs")
 cat(sprintf("Completed step 1 in %.1f seconds\n", as.numeric(step_elapsed)))
 cat(sprintf("Pipeline progress: 1/%d steps completed\n", length(required_scripts)))
