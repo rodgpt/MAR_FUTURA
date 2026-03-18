@@ -1,22 +1,21 @@
 project_root <- "/Users/rodrigo/Desktop/CODES/Boat Detector/Islam/medium-gain-analysis"
-input_data_root <- "/Users/rodrigo/Library/CloudStorage/GoogleDrive-royanedel@marfutura.org/Unidades compartidas/Hydrophones/Matanzas/13-11-25/44"
 selected_site <- "Matanzas 32"
+
+site_input_paths <- c(
+  "Las Cruces 26" = "",
+  "Matanzas 32" = "",
+  "San Antonio 38" = "",
+  "Ventanas 36" = "",
+  "Zapallar 34" = "",
+  "Ventanas 38" = "",
+  "Zapallar 32" = ""
+)
+
+valid_sites <- names(site_input_paths)
 
 if (!dir.exists(project_root)) {
   stop(sprintf("project_root does not exist: %s", project_root))
 }
-
-if (!dir.exists(input_data_root)) {
-  stop(sprintf("input_data_root does not exist: %s", input_data_root))
-}
-
-valid_sites <- c(
-  "Las Cruces 26",
-  "Matanzas 32",
-  "San Antonio 38",
-  "Ventanas 36",
-  "Zapallar 34"
-)
 
 if (!selected_site %in% valid_sites) {
   stop(
@@ -25,6 +24,16 @@ if (!selected_site %in% valid_sites) {
       paste(valid_sites, collapse = ", ")
     )
   )
+}
+
+input_data_root <- site_input_paths[[selected_site]]
+
+if (is.null(input_data_root) || is.na(input_data_root) || input_data_root == "") {
+  stop(sprintf("No input path configured for selected_site: %s", selected_site))
+}
+
+if (!dir.exists(input_data_root)) {
+  stop(sprintf("input_data_root does not exist: %s", input_data_root))
 }
 
 cat(sprintf("Running boat detection pipeline in: %s\n", project_root))

@@ -1,1 +1,2 @@
-"datetime_utc","datetime_chile","hour_chile","date_chile","is_night"
+"file","rms","boat_tonality","peak_freq","n_harmonic_peaks","spectral_entropy","band_energy_ratio","site","datetime_utc","datetime_chile","hour_chile","date_chile","is_night","rule_base","boat_detected"
+"Coro?.wav",5581.6095,2.107,109.6,3,2.526,0.11428,"Matanzas 32",NA,NA,NA,NA,NA,FALSE,FALSE
