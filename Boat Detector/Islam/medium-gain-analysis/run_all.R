@@ -2,13 +2,13 @@ project_root <- "/Users/rodrigo/Desktop/CODES/Boat Detector/Islam/medium-gain-an
 selected_site <- "Matanzas 32"
 
 site_input_paths <- c(
-  "Las Cruces 26" = "",
-  "Matanzas 32" = "",
-  "San Antonio 38" = "",
-  "Ventanas 36" = "",
-  "Zapallar 34" = "",
-  "Ventanas 38" = "",
-  "Zapallar 32" = ""
+  "Las Cruces 26" = "/Volumes/PortableSSD/Hydrophones/LasCruces/12-11-25/26",
+  "Las Cruces 41" = "/Volumes/PortableSSD/Hydrophones/LasCruces/20-10-25/41",
+  "Matanzas 32" = "/Volumes/PortableSSD/Hydrophones/Matanzas/13-11-25/32",
+  "Ventanas 36" = "/Volumes/PortableSSD/Hydrophones/Ventanas/07-11-25/36",
+  "Ventanas 38" = "/Volumes/PortableSSD/Hydrophones/Ventanas/20-10-25/38",
+  "Zapallar 34" = "/Volumes/PortableSSD/Hydrophones/Zapallar/07-11-25/34",
+  "Zapallar 32" = "/Volumes/PortableSSD/Hydrophones/Zapallar/20-10-25/32"
 )
 
 valid_sites <- names(site_input_paths)
