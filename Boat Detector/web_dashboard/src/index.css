@@ -305,3 +305,25 @@ body {
   opacity: 0.5;
   color: var(--accent-cyan);
 }
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-color);
+  border: 1px solid var(--panel-border);
+  color: var(--accent-purple);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  color: white;
+}

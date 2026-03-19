@@ -1,16 +1,14 @@
 import React from 'react';
-import { Boat, MapPin, Calendar, SlidersHorizontal, Eye } from '@phosphor-icons/react';
+import { Boat, MapPin, Eye, Hash } from '@phosphor-icons/react';
 
 export default function Sidebar({
   sites,
   selectedSite,
   setSelectedSite,
-  dateRange,
-  setDateRange,
-  minTonality,
-  setMinTonality,
   showPoints,
-  setShowPoints
+  setShowPoints,
+  minDetections,
+  setMinDetections
 }) {
   return (
     <aside className="glass-panel sidebar">
@@ -41,39 +39,19 @@ export default function Sidebar({
 
       <div className="control-group">
         <label className="control-label">
-          <Calendar weight="duotone" /> Rango de Fechas
-        </label>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <input 
-            type="date" 
-            className="custom-input" 
-            value={dateRange.start}
-            onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-          />
-          <input 
-            type="date" 
-            className="custom-input" 
-            value={dateRange.end}
-            onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-          />
-        </div>
-      </div>
-
-      <div className="control-group">
-        <label className="control-label">
-          <SlidersHorizontal weight="duotone" /> Tonalidad Mínima
+          <Hash weight="duotone" /> Mínimo Detecciones/Día
         </label>
         <div className="slider-container">
           <input 
             type="range" 
             className="custom-slider" 
-            min="0" 
-            max="200" 
+            min="1" 
+            max="20" 
             step="1"
-            value={minTonality}
-            onChange={(e) => setMinTonality(Number(e.target.value))}
+            value={minDetections}
+            onChange={(e) => setMinDetections(Number(e.target.value))}
           />
-          <span className="slider-value">{minTonality}</span>
+          <span className="slider-value">{minDetections}</span>
         </div>
       </div>
 

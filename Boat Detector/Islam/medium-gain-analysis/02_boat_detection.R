@@ -78,8 +78,7 @@ for (site_name in sites) {
     peak_freq        <= FREQ_MAX                             &
     n_harmonic_peaks >= 1                                    &
     !(peak_freq >= INTERF_LOW & peak_freq <= INTERF_HIGH)    &
-    !(peak_freq < 200 & n_harmonic_peaks < p$low_freq_peaks) &
-    is_night == TRUE
+    !(peak_freq < 200 & n_harmonic_peaks < p$low_freq_peaks)
   )
 
   # Matanzas: exclude biological sound band 100-135 Hz
@@ -101,7 +100,7 @@ for (site_name in sites) {
 
 # ── Summary ──────────────────────────────────────────────────
 cat("============================================================\n")
-cat("RESULTS — Nighttime only (22:00-06:00 Chile local, UTC-3)\n")
+cat("RESULTS — All hours\n")
 cat("============================================================\n\n")
 cat(sprintf("%-20s  %7s  %7s  %6s\n","Site","Hours","Events","Files"))
 cat(strrep("-", 46), "\n")
@@ -128,11 +127,12 @@ cat(sprintf("%-20s  %7.1fh  %7d  %6d\n",
     "TOTAL", nrow(all_features)*60/3600,
     total_events, sum(all_features$boat_detected, na.rm=TRUE)))
 
-write.csv(all_features, "boat_features_all.csv", row.names=FALSE)
+all_features$time_chile <- format(all_features$datetime_chile, "%H:%M")
+all_features$site_group <- trimws(sub("\\s+[0-9]+$", "", all_features$site))
 
 dir.create("outputs", showWarnings=FALSE)
 det_out <- all_features[all_features$boat_detected==TRUE,
-  c("site","file","date_chile","hour_chile",
+  c("site_group","site","file","date_chile","time_chile","hour_chile",
     "boat_tonality","n_harmonic_peaks","peak_freq")]
 write.csv(det_out, "outputs/boat_detections_FINAL.csv", row.names=FALSE)
 cat("\nSaved: outputs/boat_detections_FINAL.csv\n")

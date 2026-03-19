@@ -12,7 +12,23 @@ function parseDatetimeFromFilename(filename) {
   const min = parseInt(base.substring(11, 13));
   const sec = parseInt(base.substring(13, 15));
   
-  return new Date(Date.UTC(year, month, day, hour, min, sec));
+  // Create a UTC date representing the file time
+  const fileUTC = new Date(Date.UTC(year, month, day, hour, min, sec));
+  
+  // Subtract 3 hours to get Chile time in UTC
+  const chileMs = fileUTC.getTime() - (3 * 3600 * 1000);
+  const chileUTC = new Date(chileMs);
+  
+  // Now reconstruct a browser-local Date treating the Chile time as local
+  // so that date-fns formatting output the exact numbers as Chile time.
+  return new Date(
+    chileUTC.getUTCFullYear(),
+    chileUTC.getUTCMonth(),
+    chileUTC.getUTCDate(),
+    chileUTC.getUTCHours(),
+    chileUTC.getUTCMinutes(),
+    chileUTC.getUTCSeconds()
+  );
 }
 
 function App() {
@@ -21,9 +37,11 @@ function App() {
   
   const [sites, setSites] = useState([]);
   const [selectedSite, setSelectedSite] = useState('');
-  const [dateRange, setDateRange] = useState({ start: '', end: '' });
-  const [minTonality, setMinTonality] = useState(0);
   const [showPoints, setShowPoints] = useState(true);
+  
+  // Drill-down and filters
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [minDetections, setMinDetections] = useState(1);
 
   useEffect(() => {
     Papa.parse('/data/boat_detections_FINAL.csv', {
@@ -33,17 +51,15 @@ function App() {
       skipEmptyLines: true,
       complete: (results) => {
         const parsedData = results.data.map(d => {
-          let utcDate;
+          let chileDate;
           try {
-            utcDate = parseDatetimeFromFilename(d.file);
+            chileDate = parseDatetimeFromFilename(d.file);
           } catch(e) {
-            utcDate = new Date();
+            chileDate = new Date();
           }
-          const chileDate = new Date(utcDate.getTime() - 3 * 3600 * 1000);
           
           return {
             ...d,
-            datetime_utc: utcDate,
             datetime_chile: chileDate,
             date_chile: d.date_chile 
           };
@@ -54,16 +70,6 @@ function App() {
         const uniqueSites = [...new Set(parsedData.map(d => d.site).filter(Boolean))].sort();
         setSites(uniqueSites);
         if (uniqueSites.length > 0) setSelectedSite(uniqueSites[0]);
-
-        if (parsedData.length > 0) {
-          const dates = parsedData.map(d => d.date_chile).filter(Boolean).sort();
-          if (dates.length > 0) {
-            setDateRange({
-              start: dates[0],
-              end: dates[dates.length - 1]
-            });
-          }
-        }
         
         setLoading(false);
       },
@@ -79,13 +85,14 @@ function App() {
     
     return data.filter(d => {
       if (d.site !== selectedSite) return false;
-      if (dateRange.start && d.date_chile < dateRange.start) return false;
-      if (dateRange.end && d.date_chile > dateRange.end) return false;
-      if (d.boat_tonality != null && d.boat_tonality < minTonality) return false;
-      
       return true;
     });
-  }, [data, selectedSite, dateRange, minTonality]);
+  }, [data, selectedSite]);
+  
+  // Whenever the site changes, reset the selected date to go back to the top-level view
+  useEffect(() => {
+    setSelectedDate(null);
+  }, [selectedSite]);
 
   return (
     <>
@@ -101,17 +108,18 @@ function App() {
           sites={sites}
           selectedSite={selectedSite}
           setSelectedSite={setSelectedSite}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          minTonality={minTonality}
-          setMinTonality={setMinTonality}
           showPoints={showPoints}
           setShowPoints={setShowPoints}
+          minDetections={minDetections}
+          setMinDetections={setMinDetections}
         />
         
         <Charts 
           data={filteredData}
           showPoints={showPoints}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          minDetections={minDetections}
         />
       </div>
     </>

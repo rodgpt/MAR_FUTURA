@@ -7,7 +7,7 @@ site_input_paths <- c(
   "Las Cruces 41" = "/Volumes/PortableSSD/Hydrophones/LasCruces/20-10-25/41",
   "Matanzas 32" = "/Volumes/PortableSSD/Hydrophones/Matanzas/13-11-25/32",
   "Ventanas 36" = "/Volumes/PortableSSD/Hydrophones/Ventanas/07-11-25/36",
-  "Ventanas 38" = "/Volumes/PortableSSD/Hydrophones/Ventanas/20-10-25/38",
+  "Ventanas 38" = "/Volumes/PortableSSD/Hydrophones/Ventanas/20-10-25/38/Untitled",
   "Zapallar 34" = "/Volumes/PortableSSD/Hydrophones/Zapallar/07-11-25/34",
   "Zapallar 32" = "/Volumes/PortableSSD/Hydrophones/Zapallar/20-10-25/32"
 )
@@ -73,8 +73,7 @@ wav_count <- if (isTRUE(run_all_sites)) {
 
 required_scripts <- c(
   "01_extract_features.R",
-  "02_boat_detection.R",
-  "03_report_events.R"
+  "02_boat_detection.R"
 )
 
 missing_scripts <- required_scripts[
@@ -149,7 +148,15 @@ for (i in seq_along(required_scripts[-1])) {
 pipeline_elapsed <- difftime(Sys.time(), pipeline_start, units = "secs")
 cat("Pipeline completed successfully.\n")
 cat(sprintf("Total elapsed time: %.1f seconds\n", as.numeric(pipeline_elapsed)))
-cat(sprintf("Features: %s\n", file.path(project_root, "boat_features_all.csv")))
 cat(sprintf("Detections: %s\n", file.path(project_root, "outputs", "boat_detections_FINAL.csv")))
-cat(sprintf("Events: %s\n", file.path(project_root, "outputs", "vessel_events_FINAL.csv")))
+
+features_path <- file.path(project_root, "boat_features_all.csv")
+if (file.exists(features_path)) {
+  unlink(features_path)
+}
+
+events_path <- file.path(project_root, "outputs", "vessel_events_FINAL.csv")
+if (file.exists(events_path)) {
+  unlink(events_path)
+}
 flush.console()
