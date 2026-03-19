@@ -20,7 +20,6 @@ function parseDatetimeFromFilename(filename) {
   const chileUTC = new Date(chileMs);
   
   // Now reconstruct a browser-local Date treating the Chile time as local
-  // so that date-fns formatting output the exact numbers as Chile time.
   return new Date(
     chileUTC.getUTCFullYear(),
     chileUTC.getUTCMonth(),
@@ -36,12 +35,14 @@ function App() {
   const [loading, setLoading] = useState(true);
   
   const [sites, setSites] = useState([]);
-  const [selectedSite, setSelectedSite] = useState('');
+  const [selectedSite, setSelectedSite] = useState('Todos');
   const [showPoints, setShowPoints] = useState(true);
   
   // Drill-down and filters
   const [selectedDate, setSelectedDate] = useState(null);
   const [minDetections, setMinDetections] = useState(1);
+  const [startHour, setStartHour] = useState(0);
+  const [endHour, setEndHour] = useState(23);
 
   useEffect(() => {
     Papa.parse('/data/boat_detections_FINAL.csv', {
@@ -67,9 +68,13 @@ function App() {
 
         setData(parsedData);
         
-        const uniqueSites = [...new Set(parsedData.map(d => d.site).filter(Boolean))].sort();
-        setSites(uniqueSites);
-        if (uniqueSites.length > 0) setSelectedSite(uniqueSites[0]);
+        // Group by base site name
+        const uniqueGroups = [...new Set(parsedData.map(d => {
+          if (!d.site) return "";
+          return d.site.replace(/\s*\d+$/, '').trim();
+        }).filter(Boolean))].sort();
+        
+        setSites(["Todos", ...uniqueGroups]);
         
         setLoading(false);
       },
@@ -84,10 +89,17 @@ function App() {
     if (!data.length) return [];
     
     return data.filter(d => {
-      if (d.site !== selectedSite) return false;
+      // 1. Filter by location group
+      const dGroup = d.site ? d.site.replace(/\s*\d+$/, '').trim() : "";
+      if (selectedSite !== "Todos" && dGroup !== selectedSite) return false;
+      
+      // 2. Filter by hour range
+      const hour = d.datetime_chile.getHours();
+      if (hour < startHour || hour > endHour) return false;
+
       return true;
     });
-  }, [data, selectedSite]);
+  }, [data, selectedSite, startHour, endHour]);
   
   // Whenever the site changes, reset the selected date to go back to the top-level view
   useEffect(() => {
@@ -112,6 +124,10 @@ function App() {
           setShowPoints={setShowPoints}
           minDetections={minDetections}
           setMinDetections={setMinDetections}
+          startHour={startHour}
+          setStartHour={setStartHour}
+          endHour={endHour}
+          setEndHour={setEndHour}
         />
         
         <Charts 

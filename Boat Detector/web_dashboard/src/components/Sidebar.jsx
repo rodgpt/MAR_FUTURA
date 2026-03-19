@@ -1,5 +1,5 @@
 import React from 'react';
-import { Boat, MapPin, Eye, Hash } from '@phosphor-icons/react';
+import { Boat, MapPin, Eye, Hash, Clock } from '@phosphor-icons/react';
 
 export default function Sidebar({
   sites,
@@ -8,7 +8,11 @@ export default function Sidebar({
   showPoints,
   setShowPoints,
   minDetections,
-  setMinDetections
+  setMinDetections,
+  startHour,
+  setStartHour,
+  endHour,
+  setEndHour
 }) {
   return (
     <aside className="glass-panel sidebar">
@@ -24,7 +28,7 @@ export default function Sidebar({
 
       <div className="control-group">
         <label className="control-label">
-          <MapPin weight="duotone" /> Ubicación
+          <MapPin weight="duotone" /> Ubicación (Grupo)
         </label>
         <select 
           className="custom-select" 
@@ -35,6 +39,31 @@ export default function Sidebar({
             <option key={site} value={site}>{site}</option>
           ))}
         </select>
+      </div>
+
+      <div className="control-group">
+        <label className="control-label">
+          <Clock weight="duotone" /> Rango Horario (0-23)
+        </label>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '8px' }}>
+          <input 
+            type="number" 
+            min="0" 
+            max="23"
+            value={startHour}
+            onChange={(e) => setStartHour(Math.min(23, Math.max(0, parseInt(e.target.value) || 0)))}
+            style={{ flex: 1, borderRadius: '6px', border: '1px solid var(--panel-border)', padding: '6px 8px', background: 'var(--bg-color)', color: 'var(--text-primary)', outline: 'none' }}
+          />
+          <span style={{ color: 'var(--text-secondary)' }}>-</span>
+          <input 
+            type="number" 
+            min="0" 
+            max="23"
+            value={endHour}
+            onChange={(e) => setEndHour(Math.min(23, Math.max(0, parseInt(e.target.value) || 0)))}
+            style={{ flex: 1, borderRadius: '6px', border: '1px solid var(--panel-border)', padding: '6px 8px', background: 'var(--bg-color)', color: 'var(--text-primary)', outline: 'none' }}
+          />
+        </div>
       </div>
 
       <div className="control-group">
