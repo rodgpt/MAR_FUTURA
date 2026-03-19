@@ -47,8 +47,7 @@ report_events <- function(site_name, all_features) {
   out
 }
 
-sites <- c("Las Cruces 26","Matanzas 32","San Antonio 38",
-           "Ventanas 36","Zapallar 34")
+sites <- sort(unique(all_features$site))
 
 all_events <- data.frame()
 for (site_name in sites) {

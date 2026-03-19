@@ -1,5 +1,6 @@
 project_root <- "/Users/rodrigo/Desktop/CODES/Boat Detector/Islam/medium-gain-analysis"
 run_all_sites <- TRUE
+selected_site <- "Matanzas 32"
 
 site_input_paths <- c(
   "Las Cruces 26" = "/Volumes/PortableSSD/Hydrophones/LasCruces/12-11-25/26",
@@ -17,13 +18,17 @@ if (!dir.exists(project_root)) {
   stop(sprintf("project_root does not exist: %s", project_root))
 }
 
-if (!selected_site %in% valid_sites) {
-  stop(
-    sprintf(
-      "selected_site must be one of: %s",
-      paste(valid_sites, collapse = ", ")
+if (isTRUE(run_all_sites)) {
+  selected_site <- names(site_input_paths)[1]
+} else {
+  if (!selected_site %in% valid_sites) {
+    stop(
+      sprintf(
+        "selected_site must be one of: %s",
+        paste(valid_sites, collapse = ", ")
+      )
     )
-  )
+  }
 }
 
 input_data_root <- site_input_paths[[selected_site]]
@@ -37,8 +42,12 @@ if (!dir.exists(input_data_root)) {
 }
 
 cat(sprintf("Running boat detection pipeline in: %s\n", project_root))
-cat(sprintf("Reading WAV files from: %s\n", input_data_root))
-cat(sprintf("Using site label: %s\n", selected_site))
+if (isTRUE(run_all_sites)) {
+  cat(sprintf("Reading WAV files from %d site folders\n", length(site_input_paths)))
+} else {
+  cat(sprintf("Reading WAV files from: %s\n", input_data_root))
+  cat(sprintf("Using site label: %s\n", selected_site))
+}
 cat("Scanning input folder for WAV files...\n")
 flush.console()
 

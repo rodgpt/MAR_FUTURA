@@ -22,6 +22,8 @@ if (!"datetime_chile" %in% names(all_features)) {
 }
 
 # ── Site parameters ──────────────────────────────────────────
+default_site_param <- list(tonality=30, min_cluster=1, low_freq_peaks=2)
+
 site_params <- list(
   "Las Cruces 26"  = list(tonality=30, min_cluster=1, low_freq_peaks=2),
   "Matanzas 32"    = list(tonality=30, min_cluster=1, low_freq_peaks=2),
@@ -29,6 +31,13 @@ site_params <- list(
   "Ventanas 36"    = list(tonality=25, min_cluster=2, low_freq_peaks=2),
   "Zapallar 34"    = list(tonality=30, min_cluster=1, low_freq_peaks=2)
 )
+
+sites <- sort(unique(all_features$site))
+for (site_name in sites) {
+  if (is.null(site_params[[site_name]])) {
+    site_params[[site_name]] <- default_site_param
+  }
+}
 
 FREQ_MIN    <- 100;  FREQ_MAX    <- 600
 INTERF_LOW  <- 520;  INTERF_HIGH <- 595
@@ -57,7 +66,7 @@ apply_cluster_filter <- function(site_name, features, flag_col, min_size) {
 # ── Apply rule ───────────────────────────────────────────────
 all_features$rule_base <- FALSE
 
-for (site_name in names(site_params)) {
+for (site_name in sites) {
   p   <- site_params[[site_name]]
   idx <- which(all_features$site == site_name)
   s   <- all_features[idx, ]
@@ -82,7 +91,7 @@ for (site_name in names(site_params)) {
 }
 
 all_features$boat_detected <- FALSE
-for (site_name in names(site_params)) {
+for (site_name in sites) {
   p    <- site_params[[site_name]]
   idx  <- which(all_features$site == site_name)
   keep <- apply_cluster_filter(site_name, all_features,
@@ -98,7 +107,7 @@ cat(sprintf("%-20s  %7s  %7s  %6s\n","Site","Hours","Events","Files"))
 cat(strrep("-", 46), "\n")
 
 total_events <- 0
-for (site_name in names(site_params)) {
+for (site_name in sites) {
   s   <- all_features[all_features$site==site_name, ]
   hrs <- round(nrow(s)*60/3600, 1)
   det <- sum(s$boat_detected, na.rm=TRUE)
