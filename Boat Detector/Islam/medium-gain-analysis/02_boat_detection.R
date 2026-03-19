@@ -128,11 +128,10 @@ cat(sprintf("%-20s  %7.1fh  %7d  %6d\n",
     total_events, sum(all_features$boat_detected, na.rm=TRUE)))
 
 all_features$time_chile <- format(all_features$datetime_chile, "%H:%M")
-all_features$site_group <- trimws(sub("\\s+[0-9]+$", "", all_features$site))
 
 dir.create("outputs", showWarnings=FALSE)
 det_out <- all_features[all_features$boat_detected==TRUE,
-  c("site_group","site","file","date_chile","time_chile","hour_chile",
+  c("site","file","date_chile","time_chile","hour_chile",
     "boat_tonality","n_harmonic_peaks","peak_freq")]
 write.csv(det_out, "outputs/boat_detections_FINAL.csv", row.names=FALSE)
 cat("\nSaved: outputs/boat_detections_FINAL.csv\n")
