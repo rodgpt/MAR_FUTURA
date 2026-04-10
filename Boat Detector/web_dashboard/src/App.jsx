@@ -95,7 +95,13 @@ function App() {
       
       // 2. Filter by hour range
       const hour = d.datetime_chile.getHours();
-      if (hour < startHour || hour > endHour) return false;
+      if (startHour <= endHour) {
+         // Normal range, e.g. 08 to 18
+         if (hour < startHour || hour > endHour) return false;
+      } else {
+         // Overnight wrap-around range, e.g. 22 to 06
+         if (hour < startHour && hour > endHour) return false;
+      }
 
       return true;
     });
