@@ -1,0 +1,13 @@
+{
+  "summary": {
+    "folder": "/Users/rodrigo/Library/CloudStorage/GoogleDrive-royanedel@marfutura.org/Unidades compartidas/Hydrophones/Peru Bombs/Peru_5s",
+    "processed_files": 3311,
+    "detections": 0,
+    "segmentation_threshold_s": 10,
+    "segment_duration_s": 5,
+    "generated_at": "2026-04-16T14:25:54.813125",
+    "detections_after_filter": 0,
+    "min_confidence": 0.9
+  },
+  "timeline": []
+}

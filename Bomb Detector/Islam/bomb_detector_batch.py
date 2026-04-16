@@ -338,4 +338,9 @@ if __name__ == '__main__':
 
  # Tu run:
  #.venv311/bin/python -m pip install -U pip
- # python bomb_detector_batch.py /Users/rodrigo/Desktop/CODES/Bomb\ Detector/test_files --output-prefix timeline_test --output-dir /Users/rodrigo/Desktop/CODES/Bomb\ Detector/results
+ # python bomb_detector_batch.py /Users/rodrigo/Desktop/CODES/Bomb Detector/test_files --output-prefix timeline_test --output-dir /Users/rodrigo/Desktop/CODES/Bomb\ Detector/results
+
+
+
+ import sys
+print(sys.executable)
